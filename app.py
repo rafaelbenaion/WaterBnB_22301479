@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello_world():
-    return 'Hello, Rafa!'
+    #return 'Hello, Rafa!'
     idu  = request.args.get('idu', 'No idu provided')
     idswp = request.args.get('idswp', 'No idswp provided')
     return f'idu: {idu}, idswp: {idswp}'
