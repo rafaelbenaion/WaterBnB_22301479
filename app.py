@@ -43,7 +43,7 @@ from pymongo import MongoClient
 ADMIN = True  # Faut etre ADMIN pour ecrire dans la base
 # client = MongoClient("mongodb+srv://menez:monpassadminQ@cluster0.x0zyf.mongodb.net/?retryWrites=true&w=majority")
 # client = MongoClient("mongodb+srv://logincfsujet:pwdcfsujet@cluster0.x0zyf.mongodb.net/?retryWrites=true&w=majority")
-client = MongoClient("mongodb+srv://admin:<admin>@waterbnb.lo1mkvx.mongodb.net/?retryWrites=true&w=majority")
+client = MongoClient("mongodb+srv://admin:<admin>@waterbnb.lo1mkvx.mongodb.net/")
 
 # db is an attribute of client =>  all databases
 
