@@ -140,6 +140,9 @@ def client():
 # @app.route('/open') # ou en GET seulement
 
 def openthedoor():
+    # recover the piscines dictionary from the global scope
+    global piscines
+
     idu = request.args.get('idu')  # idu : clientid of the service
     idswp = request.args.get('idswp')  # idswp : id of the swimming pool
     session['idu'] = idu
@@ -154,7 +157,7 @@ def openthedoor():
     else:
         granted = "NO"
     #return jsonify({'idu': session['idu'], 'idswp': session['idswp'], "granted": granted}), 200
-    return piscines
+    return jsonify(piscines)
 
 # Test with => curl -X POST https://waterbnbf.onrender.com/open?who=gillou
 # Test with => curl https://waterbnbf.onrender.com/open?who=gillou
@@ -205,6 +208,7 @@ def handle_connect(client, userdata, flags, rc):
 @mqtt_client.on_message()
 def handle_mqtt_message(client, userdata, msg):
     global topicname
+    global piscines
      # list of swimming pools active
 
     data = dict(
