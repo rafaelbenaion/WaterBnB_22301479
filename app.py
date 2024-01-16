@@ -36,20 +36,20 @@ from pymongo import MongoClient
 # https://python-adv-web-apps.readthedocs.io/en/latest/flask.html
 # https://www.emqx.com/en/blog/how-to-use-mqtt-in-flask
 
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-# Initialisation :  Mongo DataBase
+# -------------------------------------------------------------------------------------------------------- #
+# Mongo database connection                                                                                #
+# -------------------------------------------------------------------------------------------------------- #
 
-# Connect to Cluster Mongo : attention aux permissions "network"/MONGO  !!!!!!!!!!!!!!!!
-ADMIN = True  # Faut etre ADMIN pour ecrire dans la base
-# client = MongoClient("mongodb+srv://menez:monpassadminQ@cluster0.x0zyf.mongodb.net/?retryWrites=true&w=majority")
-# client = MongoClient("mongodb+srv://logincfsujet:pwdcfsujet@cluster0.x0zyf.mongodb.net/?retryWrites=true&w=majority")
+ADMIN  = False
 client = MongoClient("mongodb+srv://admin:admin@waterbnb.lo1mkvx.mongodb.net/")
 
 # db is an attribute of client =>  all databases
 
-# Looking for "WaterBnB" database
-# https://stackoverflow.com/questions/32438661/check-database-exists-in-mongodb-using-pymongo
-dbname = 'WaterBnB'
+# -------------------------------------------------------------------------------------------------------- #
+# Looking for "WaterBnB" database                                                                          #
+# -------------------------------------------------------------------------------------------------------- #
+
+dbname  = 'WaterBnB'
 dbnames = client.list_database_names()
 if dbname in dbnames:
     print(f"{dbname} is there!")
@@ -58,28 +58,36 @@ else:
 
 db = client.WaterBnB
 
-# Looking for "users" collection in the WaterBnB database
-collname = 'users'
+# -------------------------------------------------------------------------------------------------------- #
+#  Looking for "users" collection in the WaterBnB database                                                 #
+# -------------------------------------------------------------------------------------------------------- #
+
+collname  = 'users'
 collnames = db.list_collection_names()
+
 if collname in collnames:
     print(f"{collname} is there!")
 else:
     print(f"YOU HAVE to CREATE the {collname} collection !\n")
 
 userscollection = db.users
-# -----------------------------------------------------------------------------
-# import authorized users .. if not already in ?
+
+# -------------------------------------------------------------------------------------------------------- #
+#  Import authorized users                                                                                 #
+# -------------------------------------------------------------------------------------------------------- #
+
 if ADMIN:
     userscollection.delete_many({})  # empty collection
     excel = csv.reader(open("usersM1_2023.csv"))  # list of authorized users
-    for l in excel:  # import in mongodb
+    for l in excel:
         ls = (l[0].split(';'))
-        # print(ls)
         if userscollection.find_one({"name": ls[0]}) == None:
             userscollection.insert_one({"name": ls[0], "num": ls[1]})
 
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-# Initialisation :  Flask service
+# -------------------------------------------------------------------------------------------------------- #
+#  Initialisation :  Flask service                                                                         #
+# -------------------------------------------------------------------------------------------------------- #
+
 app = Flask(__name__)
 
 # Notion de session ! .. to share between routes !
@@ -89,17 +97,19 @@ app = Flask(__name__)
 # https://stackoverflow.com/questions/49664010/using-variables-across-flask-routes
 app.secret_key = 'BAD_SECRET_KEY'
 
+# -------------------------------------------------------------------------------------------------------- #
+#  Route /                                                                                                 #
+# -------------------------------------------------------------------------------------------------------- #
 
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 @app.route('/')
 def hello_world():
     return render_template('index.html')  # 'Hello, World!'
 
 
-# Test with =>  curl https://waterbnbf.onrender.com/
+# -------------------------------------------------------------------------------------------------------- #
+#  Route /post                                                                                             #
+# -------------------------------------------------------------------------------------------------------- #
 
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-"""
 #https://stackabuse.com/how-to-get-users-ip-address-using-flask/
 @app.route("/ask_for_access", methods=["POST"])
 def get_my_ip():
@@ -115,8 +125,11 @@ def get_my_ip():
 def client():
     ip_addr = request.environ['REMOTE_ADDR']
     return '<h1> Your IP address is:' + ip_addr
-"""
 
+
+# -------------------------------------------------------------------------------------------------------- #
+#  Route /open                                                                                             #
+# -------------------------------------------------------------------------------------------------------- #
 
 # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For
 # If a request goes through multiple proxies, the IP addresses of each successive proxy is listed.
@@ -144,11 +157,18 @@ def openthedoor():
 # Test with => curl -X POST https://waterbnbf.onrender.com/open?who=gillou
 # Test with => curl https://waterbnbf.onrender.com/open?who=gillou
 
+# -------------------------------------------------------------------------------------------------------- #
+#  Route /users                                                                                            #
+# -------------------------------------------------------------------------------------------------------- #
+
 @app.route("/users")
 def lists_users():  # Liste des utilisateurs déclarés
     todos = userscollection.find()
     return jsonify([todo['name'] for todo in todos])
 
+# -------------------------------------------------------------------------------------------------------- #
+#  Route /publish                                                                                          #
+# -------------------------------------------------------------------------------------------------------- #
 
 @app.route('/publish', methods=['POST'])
 def publish_message():
@@ -157,8 +177,10 @@ def publish_message():
     return jsonify({'code': publish_result[0]})
 
 
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-# Initialisation MQTT
+# -------------------------------------------------------------------------------------------------------- #
+#  MQTT                                                                                                    #
+# -------------------------------------------------------------------------------------------------------- #
+
 app.config['MQTT_BROKER_URL'] = "test.mosquitto.org"
 app.config['MQTT_BROKER_PORT'] = 1883
 # app.config['MQTT_USERNAME'] = ''  # Set this item when you need to verify username and password
