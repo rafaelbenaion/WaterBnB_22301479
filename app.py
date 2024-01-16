@@ -40,8 +40,9 @@ from pymongo import MongoClient
 # Mongo database connection                                                                                #
 # -------------------------------------------------------------------------------------------------------- #
 
-ADMIN  = False
-client = MongoClient("mongodb+srv://admin:admin@waterbnb.lo1mkvx.mongodb.net/")
+piscines = {} # list of swimming pools active
+ADMIN    = False
+client   = MongoClient("mongodb+srv://admin:admin@waterbnb.lo1mkvx.mongodb.net/")
 
 # db is an attribute of client =>  all databases
 
@@ -151,8 +152,8 @@ def openthedoor():
         granted = "YES"
     else:
         granted = "NO"
-    return jsonify({'idu': session['idu'], 'idswp': session['idswp'], "granted": granted}), 200
-
+    #return jsonify({'idu': session['idu'], 'idswp': session['idswp'], "granted": granted}), 200
+    return piscines
 
 # Test with => curl -X POST https://waterbnbf.onrender.com/open?who=gillou
 # Test with => curl https://waterbnbf.onrender.com/open?who=gillou
@@ -178,7 +179,7 @@ def publish_message():
 
 
 # -------------------------------------------------------------------------------------------------------- #
-#  MQTT                                                                                                    #
+# MQTT                                                                                                     #
 # -------------------------------------------------------------------------------------------------------- #
 
 app.config['MQTT_BROKER_URL'] = "test.mosquitto.org"
@@ -190,7 +191,6 @@ app.config['MQTT_TLS_ENABLED'] = False  # If your broker supports TLS, set it Tr
 
 topicname = "uca/iot/piscine"
 mqtt_client = Mqtt(app)
-
 
 @mqtt_client.on_connect()
 def handle_connect(client, userdata, flags, rc):
@@ -204,6 +204,7 @@ def handle_connect(client, userdata, flags, rc):
 @mqtt_client.on_message()
 def handle_mqtt_message(client, userdata, msg):
     global topicname
+    global piscines # list of swimming pools active
 
     data = dict(
         topic=msg.topic,
@@ -216,12 +217,23 @@ def handle_mqtt_message(client, userdata, msg):
     if (
             msg.topic == topicname):  # cf https://stackoverflow.com/questions/63580034/paho-updating-userdata-from-on-message-callback
         decoded_message = str(msg.payload.decode("utf-8"))
-        # print("\ndecoded message received = {}".format(decoded_message))
-        dic = json.loads(decoded_message)  # from string to dict
-        # print("\n Dictionnary  received = {}".format(dic))
+        #print("\ndecoded message received = {}".format(decoded_message))
 
-        who = dic["info"]["ident"]  # Qui a publié ?
-        t = dic["status"]["temperature"]  # Quelle température ?
+        dic = json.loads(decoded_message)  # from string to dict
+
+        #print("\n Dictionnary  received = {}".format(dic))
+
+        ident   = dic["info"]["ident"]            # Qui a publié ?
+        temp    = dic["status"]["temperature"]    # Quelle température ?
+        occuped = dic["piscine"]["occuped"]       # Occuped ?
+
+        new_piscine = {'temp': temp, "occuped": occuped}
+
+        #print(new_piscine)
+        # Add new piscine to the dictionary piscines with the ident as key !
+        piscines[ident] = new_piscine
+
+        print("\n piscines = {}".format(piscines))
 
 
 # %%%%%%%%%%%%%  main driver function
