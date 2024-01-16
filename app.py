@@ -140,7 +140,6 @@ def client():
 # @app.route('/open') # ou en GET seulement
 
 def openthedoor():
-    global piscines
     idu = request.args.get('idu')  # idu : clientid of the service
     idswp = request.args.get('idswp')  # idswp : id of the swimming pool
     session['idu'] = idu
@@ -206,7 +205,7 @@ def handle_connect(client, userdata, flags, rc):
 @mqtt_client.on_message()
 def handle_mqtt_message(client, userdata, msg):
     global topicname
-    global piscines # list of swimming pools active
+     # list of swimming pools active
 
     data = dict(
         topic=msg.topic,
