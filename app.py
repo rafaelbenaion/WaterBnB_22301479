@@ -5,17 +5,16 @@
 # CRafael Baptista.                                                                                        #
 # -------------------------------------------------------------------------------------------------------- #
 
-from urllib import request
-from flask import Flask
+from flask import Flask, request
 app = Flask(__name__)
 
 @app.route('/')
 def hello_world():
-    #return 'Hello, Rafa!'
-    idu  = request.args.get('idu', 'No idu provided')
+    return 'Welcome to pool P_22301479, By Rafael!'
+
+# Print get parameters from the request /open?idu=Rafael&idswp=P_22301479
+@app.route('/open')
+def open():
+    idu   = request.args.get('idu', 'No idu provided')
     idswp = request.args.get('idswp', 'No idswp provided')
     return f'idu: {idu}, idswp: {idswp}'
-
-# Print all get parameters from the request /open?idu=Rafael&idswp=P_22301479
-#@app.route('/open')
-#def open():
