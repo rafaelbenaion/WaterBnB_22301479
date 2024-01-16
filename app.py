@@ -141,7 +141,6 @@ def client():
 
 def openthedoor():
     # recover the piscines dictionary from the global scope
-    global piscines
 
     idu = request.args.get('idu')  # idu : clientid of the service
     idswp = request.args.get('idswp')  # idswp : id of the swimming pool
