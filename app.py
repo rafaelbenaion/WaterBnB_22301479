@@ -29,21 +29,21 @@ from flask import jsonify
 from flask import Flask
 from flask import session
 from flask import render_template
-# https://python-adv-web-apps.readthedocs.io/en/latest/flask.html
-
-# https://www.emqx.com/en/blog/how-to-use-mqtt-in-flask
 from flask_mqtt import Mqtt
 from flask_pymongo import PyMongo
 from pymongo import MongoClient
+
+# https://python-adv-web-apps.readthedocs.io/en/latest/flask.html
+# https://www.emqx.com/en/blog/how-to-use-mqtt-in-flask
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # Initialisation :  Mongo DataBase
 
 # Connect to Cluster Mongo : attention aux permissions "network"/MONGO  !!!!!!!!!!!!!!!!
-ADMIN = False  # Faut etre ADMIN pour ecrire dans la base
+ADMIN = True  # Faut etre ADMIN pour ecrire dans la base
 # client = MongoClient("mongodb+srv://menez:monpassadminQ@cluster0.x0zyf.mongodb.net/?retryWrites=true&w=majority")
 # client = MongoClient("mongodb+srv://logincfsujet:pwdcfsujet@cluster0.x0zyf.mongodb.net/?retryWrites=true&w=majority")
-client = MongoClient("mongodb+srv://visitor:doliprane@cluster0.x0zyf.mongodb.net/?retryWrites=true&w=majority")
+client = MongoClient("mongodb+srv://admin:<admin>@waterbnb.lo1mkvx.mongodb.net/?retryWrites=true&w=majority")
 
 # db is an attribute of client =>  all databases
 
