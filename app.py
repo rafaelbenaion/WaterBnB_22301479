@@ -2,24 +2,8 @@
 # IOT, WaterBnB Project - Flask server                                                                     #
 # -------------------------------------------------------------------------------------------------------- #
 # 16 Jan 2024, Université Côte d'Azur,                                                                     #
-# CRafael Baptista.                                                                                        #
+# Rafael Baptista.                                                                                         #
 # -------------------------------------------------------------------------------------------------------- #
-
-"""
-from flask import Flask, request
-app = Flask(__name__)
-
-@app.route('/')
-def hello_world():
-    return 'Welcome to pool P_22301479, By Rafael!'
-
-# Print get parameters from the request /open?idu=Rafael&idswp=P_22301479
-@app.route('/open')
-def open():
-    idu   = request.args.get('idu', 'No idu provided')
-    idswp = request.args.get('idswp', 'No idswp provided')
-    return f'idu: {idu}, idswp: {idswp}'
-"""
 
 import json
 import csv
@@ -32,6 +16,7 @@ from flask import render_template
 from flask_mqtt import Mqtt
 from flask_pymongo import PyMongo
 from pymongo import MongoClient
+from datetime import datetime
 
 # https://python-adv-web-apps.readthedocs.io/en/latest/flask.html
 # https://www.emqx.com/en/blog/how-to-use-mqtt-in-flask
@@ -71,7 +56,8 @@ if collname in collnames:
 else:
     print(f"YOU HAVE to CREATE the {collname} collection !\n")
 
-userscollection = db.users
+userscollection = db.users                                                                # collection users
+piscinesCol     = db.piscines                                                          # collection piscines
 
 # -------------------------------------------------------------------------------------------------------- #
 #  Import authorized users                                                                                 #
@@ -106,7 +92,6 @@ app.secret_key = 'BAD_SECRET_KEY'
 def hello_world():
     return render_template('index.html')  # 'Hello, World!'
 
-
 # -------------------------------------------------------------------------------------------------------- #
 #  Route /post                                                                                             #
 # -------------------------------------------------------------------------------------------------------- #
@@ -127,36 +112,41 @@ def client():
     ip_addr = request.environ['REMOTE_ADDR']
     return '<h1> Your IP address is:' + ip_addr
 
-
 # -------------------------------------------------------------------------------------------------------- #
 #  Route /open                                                                                             #
 # -------------------------------------------------------------------------------------------------------- #
-
-# https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For
-# If a request goes through multiple proxies, the IP addresses of each successive proxy is listed.
-# voir aussi le parsing !
 
 @app.route("/open", methods=['GET', 'POST'])
 # @app.route('/open') # ou en GET seulement
 
 def openthedoor():
-    # recover the piscines dictionary from the global scope
 
-    idu = request.args.get('idu')  # idu : clientid of the service
-    idswp = request.args.get('idswp')  # idswp : id of the swimming pool
-    session['idu'] = idu
+    # ---------------------------------------------------------------------------------------------------- #
+    #  Verify if the request can be accepted                                                               #
+    # ---------------------------------------------------------------------------------------------------- #
+
+    idu              = request.args.get('idu')                               # idu : clientid of the service
+    idswp            = request.args.get('idswp')                           # idswp : id of the swimming pool
+    session['idu']   = idu
     session['idswp'] = idswp
+
     print("\n Peer = {}".format(idu))
 
-    # ip addresses of the machine asking for opening
-    ip_addr = request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)
+    piscinesCol = db.piscines                                          # Recover piscines data from database
+    piscineInfo = piscinesCol.find_one({"_id": idswp})["data"][-1]    # Recover last data info from the pool
 
-    if userscollection.find_one({"name": idu}) != None:
-        granted = "YES"
+    ip_addr     = request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)    # ip addresses of user
+
+    if userscollection.find_one({"name": idu}) is not None and piscineInfo is not None:
+
+        if piscineInfo["occuped"] is False:                             # Check if the swimming pool is free
+            granted = "YES"
+        else:
+            granted = "NO"
     else:
         granted = "NO"
-    #return jsonify({'idu': session['idu'], 'idswp': session['idswp'], "granted": granted}), 200
-    return jsonify(piscines)
+
+    return jsonify({'idu': session['idu'], 'idswp': session['idswp'], "granted": granted}), 200
 
 # Test with => curl -X POST https://waterbnbf.onrender.com/open?who=gillou
 # Test with => curl https://waterbnbf.onrender.com/open?who=gillou
@@ -218,29 +208,51 @@ def handle_mqtt_message(client, userdata, msg):
     print("\n msg.topic = {}".format(msg.topic))
     print("\n topicname = {}".format(topicname))
 
-    if (
-            msg.topic == topicname):  # cf https://stackoverflow.com/questions/63580034/paho-updating-userdata-from-on-message-callback
+    # ---------------------------------------------------------------------------------------------------- #
+    # Writing piscines data from MQTT in the database                                                      #
+    # ---------------------------------------------------------------------------------------------------- #
+
+    if (msg.topic == topicname):
+
         decoded_message = str(msg.payload.decode("utf-8"))
         #print("\ndecoded message received = {}".format(decoded_message))
 
-        dic = json.loads(decoded_message)  # from string to dict
-
+        dic = json.loads(decoded_message)                                              # From string to dict
         #print("\n Dictionnary  received = {}".format(dic))
 
-        ident   = dic["info"]["ident"]            # Qui a publié ?
-        temp    = dic["status"]["temperature"]    # Quelle température ?
-        occuped = dic["piscine"]["occuped"]       # Occuped ?
+        ident    = dic["info"]["ident"]                                                      # Qui a publié ?
+        temp     = dic["status"]["temperature"]                                        # Quelle température ?
+        occuped  = dic["piscine"]["occuped"]                                                     # Occupied ?
+        date     = datetime.now().strftime("%d/%m/%Y %H:%M:%S")                                      # When ?
 
-        new_piscine = {'temp': temp, "occuped": occuped}
+        new_data = {'temp': temp, "occuped": occuped, "published": date}                 # Data to be stored
+        insertData(ident, new_data)                                  # Insert data in the database
 
-        #print(new_piscine)
-        # Add new piscine to the dictionary piscines with the ident as key !
-        piscines[ident] = new_piscine
-
+        piscines[ident] = new_data
         print("\n piscines = {}".format(piscines))
+        with open("output.txt", "w") as file:
+            json.dump(piscines, file, indent=4)
 
+# -------------------------------------------------------------------------------------------------------- #
+# Function for data insertion in the database                                                              #
+# -------------------------------------------------------------------------------------------------------- #
+def insertData(piscine_id, data):
 
-# %%%%%%%%%%%%%  main driver function
+    if piscinesCol.count_documents({"_id": piscine_id}) == 0:           # Check if piscine is already stored
+        piscinesCol.insert_one({                                              # Insert new piscine with data
+            "_id": piscine_id,
+            "data": [data],
+        })
+    else:
+        piscinesCol.update_one(                                       # Piscine exists so just push new data
+            {"_id": piscine_id},
+            {"$push": {"data": data}}
+        )
+
+# -------------------------------------------------------------------------------------------------------- #
+# Main                                                                                                     #
+# -------------------------------------------------------------------------------------------------------- #
+
 if __name__ == '__main__':
     # run() method of Flask class runs the application
     # on the local development server.
