@@ -145,25 +145,31 @@ def openthedoor():
 
         piscineInfo = piscinesCol.find_one({"_id": idswp})["data"][-1]
 
-        if userscollection.find_one({"name": idu}) is not None and piscineInfo is not None:
+        if (userscollection.find_one({"name": idu}) is not None):
+            userInfo = userscollection.find_one({"name": idu})
+        else:
+            userInfo = userscollection.find_one({"num": idu})
+
+        if ((userscollection.find_one({"name": idu}) is not None and piscineInfo is not None)
+                or (userscollection.find_one({"num": idu}) is not None and piscineInfo is not None)):
 
             if piscineInfo["occuped"] is False:                         # Check if the swimming pool is free
                 granted = "YES"
-                title   = "Welcome, " + idu + " !"
+                title   = "Welcome, " + userInfo["name"] + " !"
                 text    = ("The door is open, you can enter the pool " +idswp + ".\n"  +
                            "The temperature is " + str(piscineInfo["temp"]) +
                            "°C")
 
-                insertRequest(idu, idswp, granted)                       # Store the request in the database
+                insertRequest(userInfo["num"], idswp, granted)           # Store the request in the database
 
                 return render_template('index.html',title=title,text=text,image="openned")
 
             else:
                 granted = "NO"
-                title   = "Oops, sorry " +idu+ " !"
+                title   = "Oops, sorry " +userInfo["name"]+ " !"
                 text    = "The pool " +idswp+ " is already being used.\n"
 
-                insertRequest(idu, idswp, granted)  # Store the request in the database
+                insertRequest(userInfo["num"], idswp, granted)  # Store the request in the database
 
                 return render_template('index.html',title=title,text=text,image="occupied")
 
