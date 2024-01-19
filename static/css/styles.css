@@ -1,0 +1,75 @@
+
+.image-container {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.image-container img {
+    max-width: 80vh; /* Using vh units to maintain the square aspect ratio */
+    max-height: 80vh;
+    width: auto;
+    height: auto;
+}
+
+body {
+    font-family: Tate regular,Arial,"Helvetica Neue",Helvetica,sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f8f8;
+    color: #313131;
+}
+
+header {
+    background-color: #f8f8f8;
+    color: #313131;
+    text-align: center;
+    padding: 20px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5em;
+    padding-top: 50px !important;
+}
+
+header p {
+    font-size: 1.2em;
+}
+
+nav {
+    background-color: #f8f8f8;
+    padding: 10px 0;
+    text-align: center;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin-right: 20px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.1em;
+}
+
+section {
+    padding: 20px;
+    text-align: center;
+}
+
+footer {
+    background-color: #f8f8f8;
+    color: #313131;
+    text-align: center;
+    padding: 20px 0;
+
+    width: 100%;
+}
