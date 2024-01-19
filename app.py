@@ -246,15 +246,13 @@ def handle_mqtt_message(client, userdata, msg):
         ident    = dic["info"]["ident"]                                                      # Qui a publié ?
         temp     = dic["status"]["temperature"]                                        # Quelle température ?
         occuped  = dic["piscine"]["occuped"]                                                     # Occupied ?
-        date     = datetime.now().strftime("%d/%m/%Y %H:%M:%S")                                      # When ?
+        date     = datetime.now()                                                                    # When ?
 
         new_data = {'temp': temp, "occuped": occuped, "published": date}                 # Data to be stored
-        insertData(ident, new_data)                                  # Insert data in the database
+        insertData(ident, new_data)                                            # Insert data in the database
 
         piscines[ident] = new_data
         print("\n piscines = {}".format(piscines))
-        with open("output.txt", "w") as file:
-            json.dump(piscines, file, indent=4)
 
 # -------------------------------------------------------------------------------------------------------- #
 # Function for data insertion in the database                                                              #
@@ -278,7 +276,7 @@ def insertRequest(idu, idswp, granted):
         "user": idu,
         "pool": idswp,
         "granted": granted,
-        "date": datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        "date": datetime.now()
     })
 
 
