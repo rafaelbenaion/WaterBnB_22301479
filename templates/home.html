@@ -12,9 +12,21 @@
         <p>{{ text }}</p>
     </header>
 
+    <div class="image-container" style="padding: 15px 15px 5px 15px">
+        <form action="/open" method="get">
+            <label>
+                <input type="text" name="idu" placeholder="Your username">
+                <input type="text" name="idswp" placeholder="Pool identification">
+            </label>
+            <input type="submit" value="Send request">
+        </form>
+    </div>
+
     <div class="image-container">
         <img src="../static/images/{{ image }}.jpg" alt="Centered Square">
     </div>
+
+
 
     <footer>
         <p>Contact: rafael.baptista-benaion@etu.univ-cotedazur.fr</p>

@@ -7,6 +7,7 @@
 
 import json
 import csv
+import string
 
 from flask import request
 from flask import jsonify
@@ -90,7 +91,11 @@ app.secret_key = 'BAD_SECRET_KEY'
 
 @app.route('/')
 def hello_world():
-    return render_template('index.html')  # 'Hello, World!'
+    title = "WaterBnB !"
+    text = "In this page you can make a manual request to open a pool."
+
+    return render_template('home.html', title=title, text=text, image="piscine")
+
 
 # -------------------------------------------------------------------------------------------------------- #
 #  Route /post                                                                                             #
@@ -129,27 +134,39 @@ def openthedoor():
     idswp            = request.args.get('idswp')                           # idswp : id of the swimming pool
     session['idu']   = idu
     session['idswp'] = idswp
+    title            = ""
 
     print("\n Peer = {}".format(idu))
 
     piscinesCol = db.piscines                                          # Recover piscines data from database
-    piscineInfo = piscinesCol.find_one({"_id": idswp})["data"][-1]    # Recover last data info from the pool
 
-    ip_addr     = request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)    # ip addresses of user
+    if(piscinesCol.find_one({"_id": idswp}) is not None):                # Check if the swimming pool exists
 
-    if userscollection.find_one({"name": idu}) is not None and piscineInfo is not None:
+        piscineInfo = piscinesCol.find_one({"_id": idswp})["data"][-1]
 
-        if piscineInfo["occuped"] is False:                             # Check if the swimming pool is free
-            granted = "YES"
-        else:
-            granted = "NO"
-    else:
-        granted = "NO"
+        if userscollection.find_one({"name": idu}) is not None and piscineInfo is not None:
 
-    return jsonify({'idu': session['idu'], 'idswp': session['idswp'], "granted": granted}), 200
+            if piscineInfo["occuped"] is False:                         # Check if the swimming pool is free
+                granted = "YES"
+                title   = "Welcome, " + idu + " !"
+                text    = ("The door is open, you can enter the pool " +idswp + ".\n"  +
+                           "The temperature is " + str(piscineInfo["temp"]) + "°C")
 
-# Test with => curl -X POST https://waterbnbf.onrender.com/open?who=gillou
-# Test with => curl https://waterbnbf.onrender.com/open?who=gillou
+                return render_template('index.html', title=title, text=text, image="openned")
+
+            else:
+                granted = "NO"
+                title   = "Oops, sorry " +idu+ " !"
+                text    = "The pool " +idswp+ " is already being used.\n"
+
+                return render_template('index.html', title=title, text=text, image="occupied")
+
+    granted = "NO"
+    title   = "Oh no, "
+    text    = "Pool or user not found in our database."
+
+    return render_template('404.html', title=title, text=text, image="unknown")
+
 
 # -------------------------------------------------------------------------------------------------------- #
 #  Route /users                                                                                            #
