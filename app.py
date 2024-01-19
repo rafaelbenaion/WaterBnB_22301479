@@ -160,7 +160,7 @@ def openthedoor():
                            "The temperature is " + str(piscineInfo["temp"]) +
                            "°C")
 
-                insertRequest(userInfo["num"], idswp, granted)           # Store the request in the database
+                insertRequest(userInfo["num"], userInfo["name"], idswp, granted)         # Store the request
 
                 return render_template('index.html',title=title,text=text,image="openned")
 
@@ -169,7 +169,7 @@ def openthedoor():
                 title   = "Oops, sorry " +userInfo["name"]+ " !"
                 text    = "The pool " +idswp+ " is already being used.\n"
 
-                insertRequest(userInfo["num"], idswp, granted)  # Store the request in the database
+                insertRequest(userInfo["num"], userInfo["name"], idswp, granted)         # Store the request
 
                 return render_template('index.html',title=title,text=text,image="occupied")
 
@@ -276,10 +276,11 @@ def insertData(piscine_id, data):
             {"$push": {"data": data}}
         )
 
-def insertRequest(idu, idswp, granted):
+def insertRequest(uid, uname, idswp, granted):
 
     requestsCol.insert_one({                                                       # Insert new request data
-        "user": idu,
+        "userid": uid,
+        "username": uname,
         "pool": idswp,
         "granted": granted,
         "date": datetime.now()
