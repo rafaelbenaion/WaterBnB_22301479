@@ -59,6 +59,7 @@ else:
 
 userscollection = db.users                                                                # collection users
 piscinesCol     = db.piscines                                                          # collection piscines
+requestsCol     = db.requests                                            # collection for all users requests
 
 # -------------------------------------------------------------------------------------------------------- #
 #  Import authorized users                                                                                 #
@@ -150,16 +151,21 @@ def openthedoor():
                 granted = "YES"
                 title   = "Welcome, " + idu + " !"
                 text    = ("The door is open, you can enter the pool " +idswp + ".\n"  +
-                           "The temperature is " + str(piscineInfo["temp"]) + "°C")
+                           "The temperature is " + str(piscineInfo["temp"]) +
+                           "°C")
 
-                return render_template('index.html', title=title, text=text, image="openned")
+                insertRequest(idu, idswp, granted)                       # Store the request in the database
+
+                return render_template('index.html',title=title,text=text,image="openned")
 
             else:
                 granted = "NO"
                 title   = "Oops, sorry " +idu+ " !"
                 text    = "The pool " +idswp+ " is already being used.\n"
 
-                return render_template('index.html', title=title, text=text, image="occupied")
+                insertRequest(idu, idswp, granted)  # Store the request in the database
+
+                return render_template('index.html',title=title,text=text,image="occupied")
 
     granted = "NO"
     title   = "Oh no, "
@@ -265,6 +271,16 @@ def insertData(piscine_id, data):
             {"_id": piscine_id},
             {"$push": {"data": data}}
         )
+
+def insertRequest(idu, idswp, granted):
+
+    requestsCol.insert_one({                                                       # Insert new request data
+        "user": idu,
+        "pool": idswp,
+        "granted": granted,
+        "date": datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    })
+
 
 # -------------------------------------------------------------------------------------------------------- #
 # Main                                                                                                     #
