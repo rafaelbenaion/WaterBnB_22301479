@@ -1,0 +1,96 @@
+
+
+/* Basic Reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Font and Body Styling */
+  body {
+    font-family: 'Arial', sans-serif;
+    background-color: #121212; /* Dark background */
+    color: #fff; /* Light text color */
+    line-height: 1.6;
+  }
+  
+  /* Container for Content */
+  .container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: auto;
+  }
+  
+  /* Heading Styles */
+  h1, h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #fff;
+  }
+  
+  /* Card-like Box Styling */
+  .card {
+    background: #1c1c1c; /* Slightly lighter than body background */
+    margin-bottom: 20px;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+  }
+  
+  /* Grid Styling for 2 cards per line */
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Two columns */
+    gap: 20px;
+  }
+  
+  .grid-item {
+    text-align: center;
+    padding: 20px;
+    background: #262626; /* Dark background for grid items */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25); /* Shadow for grid items */
+  }
+  
+  /* Icon Styling */
+  .fas, .far {
+    font-size: 30px;
+    margin-bottom: 10px;
+    color: #0fa; /* Color for icons */
+  }
+  
+  /* Form Styles */
+  form {
+    text-align: center;
+  }
+  
+  input[type="text"], input[type="submit"] {
+    padding: 10px;
+    margin: 10px;
+    border: 1px solid #333; /* Border color for input */
+    border-radius: 5px;
+    background-color: #333; /* Dark background for input */
+    color: #fff; /* Light text color for input */
+  }
+  
+  input[type="text"] {
+    width: calc(100% - 22px);
+  }
+  
+  input[type="submit"] {
+    background-color: #0fa; /* Button background */
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  input[type="submit"]:hover {
+    background-color: #8fc7ed; /* Button hover effect */
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .grid-container {
+      grid-template-columns: 1fr; /* Single column on smaller screens */
+    }
+  }
