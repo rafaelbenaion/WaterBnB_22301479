@@ -18,7 +18,7 @@ Working on the Flask portal was particularly enjoyable, offering a valuable oppo
 
 Please note : There is a slight delay (a few minutes) after initiating an action and the corresponding response from the LED strip, such as during a refused request or when indicating occupancy.
 
-Screenshots : 
+# Screenshots : 
                                                                           
 <img width="597" alt="Screenshot 2024-01-20 at 04 15 01" src="https://github.com/rafaelbenaion/WaterBnB_22301479/assets/12467598/f2e31b6f-1f22-4dc1-98f2-2b9a703208be">
 <img width="597" alt="Screenshot 2024-01-20 at 04 17 30" src="https://github.com/rafaelbenaion/WaterBnB_22301479/assets/12467598/d0600503-1fc6-42c9-bcde-ba1f7ae7b129">
