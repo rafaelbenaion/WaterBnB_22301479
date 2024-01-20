@@ -29,18 +29,13 @@ from pymongo import MongoClient
 from datetime import datetime
 import paho.mqtt.publish as publish
 
-# https://python-adv-web-apps.readthedocs.io/en/latest/flask.html
-# https://www.emqx.com/en/blog/how-to-use-mqtt-in-flask
-
 # -------------------------------------------------------------------------------------------------------- #
 # Mongo database connection                                                                                #
 # -------------------------------------------------------------------------------------------------------- #
 
-piscines = {} # list of swimming pools active
+piscines = {}                                                                # list of swimming pools active
 ADMIN    = False
 client   = MongoClient("mongodb+srv://admin:admin@waterbnb.lo1mkvx.mongodb.net/")
-
-# db is an attribute of client =>  all databases
 
 # -------------------------------------------------------------------------------------------------------- #
 # Looking for "WaterBnB" database                                                                          #
@@ -48,6 +43,7 @@ client   = MongoClient("mongodb+srv://admin:admin@waterbnb.lo1mkvx.mongodb.net/"
 
 dbname  = 'WaterBnB'
 dbnames = client.list_database_names()
+
 if dbname in dbnames:
     print(f"{dbname} is there!")
 else:
@@ -76,8 +72,8 @@ requestsCol     = db.requests                                            # colle
 # -------------------------------------------------------------------------------------------------------- #
 
 if ADMIN:
-    userscollection.delete_many({})  # empty collection
-    excel = csv.reader(open("usersM1_2023.csv"))  # list of authorized users
+    userscollection.delete_many({})                                                       # empty collection
+    excel = csv.reader(open("usersM1_2023.csv"))                                  # list of authorized users
     for l in excel:
         ls = (l[0].split(';'))
         if userscollection.find_one({"name": ls[0]}) == None:
@@ -88,12 +84,6 @@ if ADMIN:
 # -------------------------------------------------------------------------------------------------------- #
 
 app = Flask(__name__)
-
-# Notion de session ! .. to share between routes !
-# https://flask-session.readthedocs.io/en/latest/quickstart.html
-# https://testdriven.io/blog/flask-sessions/
-# https://www.fullstackpython.com/flask-globals-session-examples.html
-# https://stackoverflow.com/questions/49664010/using-variables-across-flask-routes
 app.secret_key = 'BAD_SECRET_KEY'
 
 # -------------------------------------------------------------------------------------------------------- #
@@ -107,22 +97,15 @@ def hello_world():
 
     return render_template('home.html', title=title, text=text, image="piscine")
 
-
 # -------------------------------------------------------------------------------------------------------- #
 #  Route /post                                                                                             #
 # -------------------------------------------------------------------------------------------------------- #
 
-#https://stackabuse.com/how-to-get-users-ip-address-using-flask/
 @app.route("/ask_for_access", methods=["POST"])
 def get_my_ip():
     ip_addr = request.remote_addr
     return jsonify({'ip asking ': ip_addr}), 200
 
-# Test/Compare with  =>curl  https://httpbin.org/ip
-
-#Proxies can make this a little tricky, make sure to check out ProxyFix
-#(Flask docs) if you are using one.
-#Take a look at request.environ in your particular environment :
 @app.route("/ask_for_access", methods=["POST"])
 def client():
     ip_addr = request.environ['REMOTE_ADDR']
@@ -189,7 +172,7 @@ def openthedoor():
     title   = "Oh no, "
     text    = "Pool or user not found in our database."
 
-    requestRefusedMQTT()                                                                     # MQTT red light
+    requestRefusedMQTT()                                                                    # MQTT red light
 
     return render_template('404.html', title=title, text=text, image="unknown")
 
@@ -199,7 +182,7 @@ def openthedoor():
 # -------------------------------------------------------------------------------------------------------- #
 
 @app.route("/users")
-def lists_users():  # Liste des utilisateurs déclarés
+def lists_users():                                                         # Liste des utilisateurs déclarés
     todos = userscollection.find()
     return jsonify([todo['name'] for todo in todos])
 
@@ -209,8 +192,10 @@ def lists_users():  # Liste des utilisateurs déclarés
 
 @app.route('/publish', methods=['POST'])
 def publish_message():
-    request_data = request.get_json()
+
+    request_data   = request.get_json()
     publish_result = mqtt_client.publish(request_data['topic'], request_data['msg'])
+
     return jsonify({'code': publish_result[0]})
 
 
@@ -218,12 +203,9 @@ def publish_message():
 # MQTT                                                                                                     #
 # -------------------------------------------------------------------------------------------------------- #
 
-app.config['MQTT_BROKER_URL'] = "test.mosquitto.org"
-app.config['MQTT_BROKER_PORT'] = 1883
-# app.config['MQTT_USERNAME'] = ''  # Set this item when you need to verify username and password
-# app.config['MQTT_PASSWORD'] = ''  # Set this item when you need to verify username and password
-# app.config['MQTT_KEEPALIVE'] = 5  # Set KeepAlive time in seconds
-app.config['MQTT_TLS_ENABLED'] = False  # If your broker supports TLS, set it True
+app.config['MQTT_BROKER_URL']   = "test.mosquitto.org"
+app.config['MQTT_BROKER_PORT']  = 1883
+app.config['MQTT_TLS_ENABLED']  = False
 
 topicname = "uca/iot/piscine"
 mqtt_client = Mqtt(app)
@@ -232,22 +214,21 @@ mqtt_client = Mqtt(app)
 def handle_connect(client, userdata, flags, rc):
     if rc == 0:
         print('Connected successfully')
-        mqtt_client.subscribe(topicname)  # subscribe topic
+        mqtt_client.subscribe(topicname)                                                   # subscribe topic
     else:
         print('Bad connection. Code:', rc)
 
-
 @mqtt_client.on_message()
 def handle_mqtt_message(client, userdata, msg):
+
     global topicname
     global piscines
-     # list of swimming pools active
 
     data = dict(
         topic=msg.topic,
         payload=msg.payload.decode()
     )
-    #    print('Received message on topic: {topic} with payload: {payload}'.format(**data))
+
     print("\n msg.topic = {}".format(msg.topic))
     print("\n topicname = {}".format(topicname))
 
@@ -258,10 +239,8 @@ def handle_mqtt_message(client, userdata, msg):
     if (msg.topic == topicname):
 
         decoded_message = str(msg.payload.decode("utf-8"))
-        #print("\ndecoded message received = {}".format(decoded_message))
 
         dic = json.loads(decoded_message)                                              # From string to dict
-        #print("\n Dictionnary  received = {}".format(dic))
 
         ident    = dic["info"]["ident"]                                                      # Qui a publié ?
         temp     = dic["status"]["temperature"]                                        # Quelle température ?
@@ -275,8 +254,9 @@ def handle_mqtt_message(client, userdata, msg):
         print("\n piscines = {}".format(piscines))
 
 # -------------------------------------------------------------------------------------------------------- #
-# Function for data insertion in the database                                                              #
+# Function for pool data insertion in the database                                                         #
 # -------------------------------------------------------------------------------------------------------- #
+
 def insertData(piscine_id, data):
 
     if piscinesCol.count_documents({"_id": piscine_id}) == 0:           # Check if piscine is already stored
@@ -290,6 +270,10 @@ def insertData(piscine_id, data):
             {"$push": {"data": data}}
         )
 
+# -------------------------------------------------------------------------------------------------------- #
+# Function for request data insertion in the database                                                      #
+# -------------------------------------------------------------------------------------------------------- #
+
 def insertRequest(uid, uname, idswp, granted):
 
     requestsCol.insert_one({                                                       # Insert new request data
@@ -300,11 +284,16 @@ def insertRequest(uid, uname, idswp, granted):
         "date": datetime.now()
     })
 
+
+# -------------------------------------------------------------------------------------------------------- #
+# Function for MQTT red light request refusal                                                              #
+# -------------------------------------------------------------------------------------------------------- #
+
 def requestRefusedMQTT():
-    # MQTT Broker settings
-    MQTT_BROKER = "test.mosquitto.org"
-    MQTT_PORT = 1883
-    MQTT_TOPIC = "uca/iot/piscine/22301479"
+
+    MQTT_BROKER  = "test.mosquitto.org"
+    MQTT_PORT    = 1883
+    MQTT_TOPIC   = "uca/iot/piscine/22301479"
 
     try:
         publish.single(MQTT_TOPIC, "ERROR404", hostname=MQTT_BROKER, port=MQTT_PORT)
