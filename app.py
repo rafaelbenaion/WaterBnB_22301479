@@ -14,7 +14,6 @@
 # https://github.com/rafaelbenaion/WaterBnB_22301479                                                       #
 # -------------------------------------------------------------------------------------------------------- #
 
-
 import json
 import csv
 import string
@@ -28,6 +27,7 @@ from flask_mqtt import Mqtt
 from flask_pymongo import PyMongo
 from pymongo import MongoClient
 from datetime import datetime
+import paho.mqtt.publish as publish
 
 # https://python-adv-web-apps.readthedocs.io/en/latest/flask.html
 # https://www.emqx.com/en/blog/how-to-use-mqtt-in-flask
@@ -181,11 +181,15 @@ def openthedoor():
 
                 insertRequest(userInfo["num"], userInfo["name"], idswp, granted)         # Store the request
 
+                requestRefusedMQTT()                                                        # MQTT red light
+
                 return render_template('index.html',title=title,text=text,image="occupied")
 
     granted = "NO"
     title   = "Oh no, "
     text    = "Pool or user not found in our database."
+
+    requestRefusedMQTT()                                                                     # MQTT red light
 
     return render_template('404.html', title=title, text=text, image="unknown")
 
@@ -295,6 +299,17 @@ def insertRequest(uid, uname, idswp, granted):
         "granted": granted,
         "date": datetime.now()
     })
+
+def requestRefusedMQTT():
+    # MQTT Broker settings
+    MQTT_BROKER = "test.mosquitto.org"
+    MQTT_PORT = 1883
+    MQTT_TOPIC = "uca/iot/piscine/22301479"
+
+    try:
+        publish.single(MQTT_TOPIC, "ERROR404", hostname=MQTT_BROKER, port=MQTT_PORT)
+    except Exception as e:
+        print(e)
 
 
 # -------------------------------------------------------------------------------------------------------- #
