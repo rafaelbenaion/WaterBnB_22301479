@@ -6,15 +6,17 @@ Rafael Baptista
 
 ![unknown](https://github.com/rafaelbenaion/WaterBnB_22301479/assets/12467598/4ac85af6-ed1e-4bfc-9e07-f30ba279aa66)
 
-Dashboard :                                                                                              
-https://charts.mongodb.com/charts-project-0-uqrbc/public/dashboards/65a9d5c3-f981-4dcc-8564-91b2db846213 
-
 Web Portal :                                                                                             
 https://waterbnb-22301479.onrender.com
 
-This project was developed as part of an IoT class under the supervision of G. Menez at Université Côte d'Azur. It was undertaken in the first year of the Master's program in Computer Science. The ESP32 and Node-Red files can be found in the "extra_files" directory. Additionally, links to the Atlas Dashboard and the Flask Web Service are provided in this description for easy access. Working on the Flask portal was particularly enjoyable, offering a valuable opportunity to delve into the capabilities of the Atlas platform, especially regarding data visualization and integration. I hope you find this project as engaging and insightful as I did.
+Dashboard :                                                                                              
+https://charts.mongodb.com/charts-project-0-uqrbc/public/dashboards/65a9d5c3-f981-4dcc-8564-91b2db846213 
 
-! Please note : There is a slight delay (a few minutes) between initiating an action and the corresponding response from the LED strip, such as during a refused request or when indicating occupancy.
+This project was developed as part of an IoT class under the supervision of G. Menez at Université Côte d'Azur. It was undertaken in the first year of the Master's program in Computer Science. The ESP32 and Node-Red files can be found in the "extra_files" directory. Additionally, links to the Atlas Dashboard and the Flask Web Service are provided in this description for easy access. 
+
+Working on the Flask portal was particularly enjoyable, offering a valuable opportunity to delve into the capabilities of the integration with the MongoDB Atlas platform, especially regarding data visualization. I hope you find this project as engaging as I did.
+
+Please note : There is a slight delay (a few minutes) after initiating an action and the corresponding response from the LED strip, such as during a refused request or when indicating occupancy.
 
 Screenshots : 
                                                                           
