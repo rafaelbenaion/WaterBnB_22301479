@@ -21,5 +21,5 @@ Screenshots :
 <img width="597" alt="Screenshot 2024-01-20 at 04 15 01" src="https://github.com/rafaelbenaion/WaterBnB_22301479/assets/12467598/f2e31b6f-1f22-4dc1-98f2-2b9a703208be">
 <img width="597" alt="Screenshot 2024-01-20 at 04 17 30" src="https://github.com/rafaelbenaion/WaterBnB_22301479/assets/12467598/d0600503-1fc6-42c9-bcde-ba1f7ae7b129">
 <img width="597" alt="Screenshot 2024-01-20 at 04 20 31" src="https://github.com/rafaelbenaion/WaterBnB_22301479/assets/12467598/de398369-17f3-4622-a4ab-a9dc2a28e3a8">
-<img width="1437" alt="Screenshot 2024-01-20 at 04 18 20" src="https://github.com/rafaelbenaion/WaterBnB_22301479/assets/12467598/827654b5-9c3a-44cb-81c8-e3a80dc25ad5">
+<img width="597" alt="Screenshot 2024-01-20 at 04 18 20" src="https://github.com/rafaelbenaion/WaterBnB_22301479/assets/12467598/827654b5-9c3a-44cb-81c8-e3a80dc25ad5">
 
