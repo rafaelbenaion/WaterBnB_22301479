@@ -3,8 +3,7 @@ IOT Project - Université Côte d'Azur
 
 Rafael Baptista
 
-
-![unknown](https://github.com/rafaelbenaion/WaterBnB_22301479/assets/12467598/4ac85af6-ed1e-4bfc-9e07-f30ba279aa66)
+![60f89aae13c5b571816636](https://github.com/rafaelbenaion/WaterBnB_22301479/assets/12467598/553b4e81-d934-4e95-a66f-155872f58bb2)
 
 Web Portal :                                                                                             
 https://waterbnb-22301479.onrender.com
