@@ -366,17 +366,6 @@ void mqtt_pubcallback(char* topic,
       hotspot = false;
   }
   
-  if (String(topic) == TOPIC_LED) {
-    USE_SERIAL.print("so ... changing output to ");
-    if (message == "on") {
-      USE_SERIAL.println("on");
-      set_LED(HIGH);
-    }
-    else if (message == "off") {
-      USE_SERIAL.println("off");
-      set_LED(LOW);
-    }
-  }
 }
 
 /* -------------------------------------------------------------------------------------------------------- */
